@@ -1,8 +1,4 @@
-config/
-data/
 node_modules/
-releases/
-
 
 ### Node ###
 # Logs
