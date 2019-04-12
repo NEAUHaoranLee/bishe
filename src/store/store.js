@@ -10,8 +10,8 @@ const instance = axios.create({
 axios.defaults.withCredentials = true; //让ajax携带cookie
 
 const initState = {
-  userType: '',
-  userName: '',
+  userType: 'student',//xuesheng
+  userName: '孙云龙',
   loading: false
 }
 

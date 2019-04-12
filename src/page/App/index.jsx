@@ -14,25 +14,25 @@ class App extends PureComponent {
       isCollapse: false,
     };
   }
-  componentWillReceiveProps(newProps) {
-    const { location, history, userType } = this.props;
-    const { userType: newUserType } = newProps;
+  // componentWillReceiveProps(newProps) {
+  //   const { location, history, userType } = this.props;
+  //   const { userType: newUserType } = newProps;
 
-    if (userType !== newUserType && location.pathname === '/login') {
-      history.push(`/${newUserType}`);
-    }
-  }
+  //   if (userType !== newUserType && location.pathname === '/login') {
+  //     history.push(`/${newUserType}`);
+  //   }
+  // }
 
-  componentDidMount() {
-    // this.props.createUsers({ account: "A00000001", password: "000",userType: 'manager', userName: '李四' })
-    //cookie操作
-    const LoginCookie = Cookies.get('login-ticket');
-    if (LoginCookie) {
-      this.props.getUserInfo(LoginCookie);
-    } else {
-      this.props.history.push('/login');
-    }
-  }
+  // componentDidMount() {
+  //   // this.props.createUsers({ account: "A00000001", password: "000",userType: 'manager', userName: '李四' })
+  //   //cookie操作
+  //   const LoginCookie = Cookies.get('login-ticket');
+  //   if (LoginCookie) {
+  //     this.props.getUserInfo(LoginCookie);
+  //   } else {
+  //     this.props.history.push('/login');
+  //   }
+  // }
   toggleNav() {
     this.setState({
       isCollapse: !this.state.isCollapse,
