@@ -48,10 +48,10 @@ export const actions = {
     })
   },
   //用户登录
-  userSignIn: ({ account, password }) => (dispatch) => {
+  userSignIn: (params) => (dispatch) => {
     dispatch(actions.loadingControl(true))
 
-    const params = { account, password: md5(password) }
+    // const params = { account, passWord: md5(password) }
     instance.post('/login', params).then(({ data: { code, data } }) => {
       if (code === 200) {
         dispatch(
