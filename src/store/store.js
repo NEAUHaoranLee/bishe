@@ -4,14 +4,14 @@ import axios from 'axios';
 import md5 from 'js-md5';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:8071/',
+  baseURL: 'http://localhost:8080/',
   withCredentials: true,
 });
 axios.defaults.withCredentials = true; //让ajax携带cookie
 
 const initState = {
-  userType: 'student',//xuesheng
-  userName: '孙云龙',
+  userType: '',
+  userName: '',
   loading: false
 }
 
@@ -52,7 +52,7 @@ export const actions = {
     dispatch(actions.loadingControl(true))
 
     const params = { account, password: md5(password) }
-    instance.post('/auth/checkAuth', params).then(({ data: { code, data } }) => {
+    instance.post('/login', params).then(({ data: { code, data } }) => {
       if (code === 200) {
         dispatch(
           actions.updateProps({

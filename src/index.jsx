@@ -15,6 +15,7 @@ import Project from 'page/Student/Project';
 import MyPro from 'page/Student/myPro.jsx';
 import ViewPro from 'page/Manager/viewPro.jsx';
 import Detail from 'page/Manager/detail.jsx';
+import ProManagement from 'page/Manager/proManagement.jsx';
 
 const middlewareArr = [
   applyMiddleware(thunk)
@@ -36,6 +37,7 @@ const routers = (
         <Route exact path='/student/my-project' component={MyPro} />
         <Route exact path='/teacher' component={Teacher} />
         <Route exact path='/manager' component={Manager} />
+        <Route exact path='/manager/process-management' component={ProManagement} />
         <Route exact path='/manager/view-project' component={ViewPro} />
         <Route exact path='/manager/view-project/:id' component={Detail} />
       </Switch>

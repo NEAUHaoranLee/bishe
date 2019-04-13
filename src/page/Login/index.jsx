@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { actions } from 'store/store';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import { Form, Icon, Input, Button, Checkbox, Select } from 'antd';
 import _ from 'lodash';
 import './index.less';
 
@@ -52,6 +52,18 @@ class Login extends PureComponent {
                 type="password"
                 placeholder="密码"
               />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            {getFieldDecorator('role', {
+              rules: [{ required: true, message: '选择角色!' }],
+            })(
+              <Select>
+                <Select.Option value='学生'>学生</Select.Option>
+                <Select.Option value='评委'>评审</Select.Option>
+                <Select.Option value='老师'>指导教师</Select.Option>
+                <Select.Option value='管理员'>管理员</Select.Option>
+              </Select>
             )}
           </Form.Item>
           <Form.Item>
