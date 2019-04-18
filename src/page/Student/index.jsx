@@ -10,6 +10,11 @@ class Student extends PureComponent {
   constructor(props) {
     super(props);
   }
+  componentDidMount() {
+    this.props.getStudentProcess({
+      account: this.props.userAccount
+    })
+  }
   renderChildren() {
     return (
       <div className="my-project">

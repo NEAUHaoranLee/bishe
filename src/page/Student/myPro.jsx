@@ -45,7 +45,6 @@ class MyPro extends PureComponent {
         dataIndex: 'action',
         key: 'action',
         render: (text, record) => {
-          console.log(text, record)
           return <Link to={`/student/edit-project/${text}`}>编辑</Link>
         }
       }
@@ -63,7 +62,9 @@ class MyPro extends PureComponent {
       }
     ]
   }
-
+  componentDidMount() {
+    this.props.getStudentProject({ account: 'A19150251' })
+  }
   render() {
     return <div className="myPro-container">
       <div className="table-container">

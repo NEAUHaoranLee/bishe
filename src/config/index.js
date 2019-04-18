@@ -8,3 +8,8 @@ export const projectType = [
   '创业训练项目',
   '创业实践项目'
 ]
+export const processType = [
+  '立项',
+  '中期检查',
+  '结题'
+]

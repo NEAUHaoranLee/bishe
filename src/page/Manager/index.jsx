@@ -10,6 +10,9 @@ class Menager extends PureComponent {
   constructor(props) {
     super(props);
   }
+  componentDidMount() {
+    this.props.getManagerProcess({ account: 'admin' })
+  }
   renderChildren() {
     return (
       <div className="new-year">

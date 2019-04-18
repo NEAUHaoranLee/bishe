@@ -1,5 +1,7 @@
 import Cookies from 'browser-cookies';
-import { message } from 'antd';
+import {
+  message
+} from 'antd';
 import axios from 'axios';
 import md5 from 'js-md5';
 
@@ -10,8 +12,9 @@ const instance = axios.create({
 axios.defaults.withCredentials = true; //让ajax携带cookie
 
 const initState = {
-  userType: '',
+  userType: 'teacher',
   userName: '',
+  userAccount: '',
   loading: false
 }
 
@@ -36,7 +39,12 @@ export const actions = {
   },
   //根据cookie查询登录状态
   getUserInfo: () => (dispatch) => {
-    instance.get('/auth/checkLogin').then(({ data: { code, data } }) => {
+    instance.get('/checkLogin').then(({
+      data: {
+        code,
+        data
+      }
+    }) => {
       const userType = code === 200 ? data.userType : 'login';
 
       dispatch(
@@ -51,16 +59,22 @@ export const actions = {
   userSignIn: (params) => (dispatch) => {
     dispatch(actions.loadingControl(true))
 
-    // const params = { account, passWord: md5(password) }
-    instance.post('/login', params).then(({ data: { code, data } }) => {
+    // const params = { account, password: md5(password) }
+    instance.post('/login', params).then(({
+      data: {
+        code,
+        data
+      }
+    }) => {
       if (code === 200) {
         dispatch(
           actions.updateProps({
             userType: data.userType,
             userName: data.userName,
+            userAccount: params.account
           })
         )
-      }else if (code === 205) {
+      } else if (code === 205) {
         message.error(data)
       }
     })
@@ -78,14 +92,41 @@ export const actions = {
       )
     })
   },
-  createUsers: (params) => (dispatch) => {
-    instance.post('/auth/createAuth', params)
+  getStudentProcess: (params) => (dispatch) => {
+    instance.post('/student/currentProcess', params).then((res) => {
+      console.log(res)
+    })
+  },
+  saveProject: (params) => (dispatch) => {
+    instance.post('/student/currentProcess', params).then((res) => {
+      console.log(res)
+    })
+  },
+  getStudentProject: (params) => (dispatch) => {
+    instance.post('/student/myProject', params).then((res) => {
+      console.log(res)
+    })
+  },
+  //管理员
+  getManagerProcess: (params) => (dispatch) => {
+    instance.post('/manager/currentProcess', params).then((res) => {
+      console.log(res)
+    })
   }
+  // createUsers: (params) => (dispatch) => {
+  //   instance.post('/auth/createAuth', params)
+  // }
 }
 
-export default (state = initState, { type, payload }) => {
+export default (state = initState, {
+  type,
+  payload
+}) => {
   if (type === TYPE.UPDATE_PROPS) {
-    return { ...state, ...payload }
+    return {
+      ...state,
+      ...payload
+    }
   }
   return state;
 }

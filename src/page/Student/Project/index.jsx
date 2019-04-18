@@ -21,16 +21,22 @@ class Project extends PureComponent {
     super(props);
     this.state = {
       disabled: false,
-    }
+      first: true,
+      second: true,
+      third: true,
+      file: {},
+    };
   }
   componentDidMount() {
     if (this.props.match.params.id) {
       this.setState({
         disabled: true,
-      })
+        file: {
+          pathThird: 'kakakaka',
+        }
+      });
+      this.props.form.setFieldsValue({ pathThird: 'llala' });
     }
-    this.props.form.setFieldsValue({ projectName: 'lalala' });
-    console.log(this.props.match)
   }
   handleSubmit = (e) => {
     e.preventDefault();
@@ -39,6 +45,17 @@ class Project extends PureComponent {
         console.log('Received values of form: ', values);
       }
     });
+  };
+  normFile = (name) => {
+    return (e) => {
+      this.setState({
+        [name]: e.fileList.length === 0,
+      });
+      if (Array.isArray(e)) {
+        return e;
+      }
+      return e && e.fileList;
+    };
   };
   onSave = () => {
     const formValue = this.props.form.getFieldsValue();
@@ -58,8 +75,7 @@ class Project extends PureComponent {
         <div className="title">编辑项目</div>
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Form.Item label="项目名称:">
-            {/* <span className="ant-form-text">China</span> */}
-            {getFieldDecorator('projectName', {
+            {getFieldDecorator('pName', {
               rules: [{ required: true, message: '请输入项目名称!' }],
               validateTrigger: false,
             })(
@@ -70,7 +86,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="项目类型:">
-            {getFieldDecorator('projectType', {
+            {getFieldDecorator('pType', {
               rules: [{ required: true, message: '请选择项目类型!' }],
             })(
               <Select
@@ -90,7 +106,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="项目负责人姓名:">
-            {getFieldDecorator('oName', {
+            {getFieldDecorator('leaderName', {
               rules: [{ required: true, message: '请输入项目负责人姓名!' }],
               validateTrigger: false,
             })(
@@ -101,7 +117,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="负责人所在学院:" wrapperCol={{ span: 6 }}>
-            {getFieldDecorator('collage', {
+            {getFieldDecorator('leaderCollage', {
               rules: [{ required: true, message: '请选择所在学院!' }],
             })(
               <Select
@@ -121,7 +137,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="负责人学号:" wrapperCol={{ span: 4 }}>
-            {getFieldDecorator('oAccount', {
+            {getFieldDecorator('leaderAccount', {
               rules: [{ required: true, message: '请输入学号!' }],
               validateTrigger: false,
             })(
@@ -132,7 +148,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="参与人数:" wrapperCol={{ span: 4 }}>
-            {getFieldDecorator('projectMember', {
+            {getFieldDecorator('memberNum', {
               rules: [{ required: true, message: '请选择参与项目人数!' }],
             })(
               <Select
@@ -155,7 +171,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="其他成员信息:">
-            {getFieldDecorator('memberInfo', {
+            {getFieldDecorator('memberInf', {
               rules: [{ required: true, message: '请输入其他成员信息!' }],
               validateTrigger: false,
             })(
@@ -168,7 +184,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="指导教师姓名:">
-            {getFieldDecorator('tName', {
+            {getFieldDecorator('teacherName', {
               rules: [{ required: true, message: '请输入指导教师姓名!' }],
               validateTrigger: false,
             })(
@@ -179,7 +195,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="指导教师职称:" wrapperCol={{ span: 5 }}>
-            {getFieldDecorator('tLevel', {
+            {getFieldDecorator('teacherTitle', {
               rules: [{ required: true, message: '请输入指导教师职称!' }],
               validateTrigger: false,
             })(
@@ -204,7 +220,9 @@ class Project extends PureComponent {
             {getFieldDecorator('pCode', {
               rules: [{ required: true, message: '请输入一级学科代码!' }],
               validateTrigger: false,
-            })(<Input placeholder={formValue.pCode || ''} disabled={disabled} />)}
+            })(
+              <Input placeholder={formValue.pCode || ''} disabled={disabled} />,
+            )}
           </Form.Item>
           <Form.Item label="项目简介:">
             {getFieldDecorator('pIntroduce')(
@@ -215,41 +233,63 @@ class Project extends PureComponent {
               />,
             )}
           </Form.Item>
-          <Form.Item
-            label="Upload"
-            extra="longgggggggggggggggggggggggggggggggggg"
-          >
-            {getFieldDecorator('upload', {
+          <Form.Item label="立项申请书">
+            {getFieldDecorator('pathFirst', {
               valuePropName: 'fileList',
-              getValueFromEvent: this.normFile,
+              getValueFromEvent: this.normFile('first'),
             })(
-              <Upload name="logo" action="/upload.do" listType="picture">
-                <Button>
-                  <Icon type="upload" /> Click to upload
-                </Button>
+              <Upload
+                name="file"
+                action="http://localhost:8080/student/update"
+                type=".doc,.docx"
+              >
+                {this.state.first && (
+                  <Button>
+                    <Icon type="upload" /> 上传文件
+                  </Button>
+                )}
               </Upload>,
             )}
           </Form.Item>
-
-          <Form.Item label="Dragger">
-            <div className="dropbox">
-              {getFieldDecorator('dragger', {
-                valuePropName: 'fileList',
-                getValueFromEvent: this.normFile,
-              })(
-                <Upload.Dragger name="files" action="/upload.do">
-                  <p className="ant-upload-drag-icon">
-                    <Icon type="inbox" />
-                  </p>
-                  <p className="ant-upload-text">
-                    Click or drag file to this area to upload
-                  </p>
-                  <p className="ant-upload-hint">
-                    Support for a single or bulk upload.
-                  </p>
-                </Upload.Dragger>,
-              )}
-            </div>
+          <Form.Item label="中期检查报告">
+            {getFieldDecorator('pathSecond', {
+              valuePropName: 'fileList',
+              getValueFromEvent: this.normFile('second'),
+            })(
+              <Upload
+                name="file"
+                action="http://localhost:8080/student/update"
+                type=".doc,.docx"
+              >
+                {this.state.second && (
+                  <Button>
+                    <Icon type="upload" /> 上传文件
+                  </Button>
+                )}
+              </Upload>,
+            )}
+          </Form.Item>
+          <Form.Item label="结题报告">
+            {getFieldDecorator('pathThird', {
+              valuePropName: 'fileList',
+              getValueFromEvent: this.normFile('third'),
+            })(
+              this.state.file.pathThird ? (
+                <div>{this.state.file.pathThird}</div>
+              ) : (
+                <Upload
+                  name="file"
+                  action="http://localhost:8080/student/update"
+                  type=".doc,.docx"
+                >
+                  {this.state.third && (
+                    <Button>
+                      <Icon type="upload" /> 上传文件
+                    </Button>
+                  )}
+                </Upload>
+              ),
+            )}
           </Form.Item>
           {/* <Form.Item wrapperCol={{ span: 12, offset: 6 }}>
               <Button type="primary" htmlType="save">

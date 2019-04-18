@@ -21,5 +21,15 @@ export const navMap = {
             path: '/manager/view-project',
             name: '项目概览',
         }
+    ],
+    teacher: [
+        {
+            path: '/teacher',
+            name: '待审批',
+        },
+        {
+            path: '/teacher/view-project',
+            name: '我的项目',
+        }
     ]
 }
