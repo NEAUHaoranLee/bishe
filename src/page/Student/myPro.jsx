@@ -10,67 +10,72 @@ class MyPro extends PureComponent {
     super(props);
     this.columns = [
       {
-        title: '姓名',
-        dataIndex: 'name',
-        key: 'name',
+        title: '项目名称',
+        dataIndex: 'pName',
+        key: 'pName',
+      },
+      {
+        title: '负责人',
+        dataIndex: 'userName',
+        key: 'userName',
       },
       {
         title: '成员',
-        dataIndex: 'member',
-        key: 'member',
+        dataIndex: 'memberInf',
+        key: 'memberInf',
         className: 'member',
       },
       {
         title: '指导教师',
-        dataIndex: 'teacher',
-        key: 'teacher',
+        dataIndex: 'teacherName',
+        key: 'teacherName',
       },
       {
         title: '当前进度',
-        dataIndex: 'process',
-        key: 'process',
+        dataIndex: 'recordStatus',
+        key: 'recordStatus',
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'pStatus',
+        key: 'pStatus',
       },
       {
         title: '评审结果',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'avg',
+        key: 'avg',
       },
       {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
         render: (text, record) => {
-          return <Link to={`/student/edit-project/${text}`}>编辑</Link>
-        }
-      }
-    ]
-    this.dataSource = [
-      {
-        name: '张三',
-        member: '李四/A19100000',
-        teacher: '张宇',
-        process: '待提交',
-        status: '立项申请',
-        result: '-',
-        action: '1',
-        key: 1
-      }
-    ]
+          return (
+            <div>
+              <Link to={`/student/edit-project/${record.key}`}>download</Link>
+              {record.recordStatus !== '已提交' && (
+                <span>
+                  <Divider type='vertical'/>
+                  <Link to={`/student/edit-project/${record.key}`}>编辑</Link>
+                </span>
+              )}
+            </div>
+          );
+        },
+      },
+    ];
   }
   componentDidMount() {
-    this.props.getStudentProject({ account: 'A19150251' })
+    this.props.getStudentProject({ account: this.props.userAccount });
   }
   render() {
-    return <div className="myPro-container">
-      <div className="table-container">
-        <Table dataSource={this.dataSource} columns={this.columns}/>
+    return (
+      <div className="myPro-container">
+        <div className="table-container">
+          <Table dataSource={this.props.sProject} columns={this.columns} />
+        </div>
       </div>
-    </div>;
+    );
   }
 }
 

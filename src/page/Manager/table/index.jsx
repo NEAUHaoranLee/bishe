@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { collage, projectType } from 'config/index';
 import { Table, Select, Button, message } from 'antd';
+import { manageSubmitFormatter } from 'src/pure';
 import _ from 'lodash';
 import './index.less';
 
@@ -37,9 +38,16 @@ export default class proBoard extends PureComponent {
     };
     this.columns = [
       {
+        title: '项目名称',
+        dataIndex: 'pName',
+        key: 'pName',
+        width: 200,
+        fixed: 'left',
+      },
+      {
         title: '学院',
-        dataIndex: 'collage',
-        key: 'collage',
+        dataIndex: 'college',
+        key: 'college',
         filters: collage.map((item) => {
           return {
             text: item,
@@ -50,58 +58,60 @@ export default class proBoard extends PureComponent {
       },
       {
         title: '姓名',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'leaderName',
+        key: 'leaderName',
       },
       {
         title: '指导教师',
-        dataIndex: 'teacher',
-        key: 'teacher',
+        dataIndex: 'tName',
+        key: 'tName',
       },
       {
         title: '类型',
-        dataIndex: 'type',
-        key: 'type',
+        dataIndex: 'pType',
+        key: 'pType',
         filters: projectType.map((item) => {
           return {
             text: item,
             value: item,
           };
         }),
-        onFilter: (value, record) => record.type === value,
+        onFilter: (value, record) => record.pType === value,
       },
       {
         title: '评审1',
-        dataIndex: 'result1',
-        key: 'result1',
+        dataIndex: 'oneGrade',
+        key: 'oneGrade',
       },
       {
         title: '评审2',
-        dataIndex: 'result2',
-        key: 'result2',
+        dataIndex: 'twoGrade',
+        key: 'twoGrade',
       },
       {
         title: '评审3',
-        dataIndex: 'result3',
-        key: 'result3',
+        dataIndex: 'threeGrade',
+        key: 'threeGrade',
       },
       {
         title: '评审4',
-        dataIndex: 'result4',
-        key: 'result4',
+        dataIndex: 'fourGrade',
+        key: 'fourGrade',
       },
       {
         title: '平均分',
-        dataIndex: 'avg',
-        key: 'avg',
+        dataIndex: 'pgAvg',
+        key: 'pgAvg',
         sorter: (a, b) => {
-          return parseFloat(a.avg) - parseFloat(b.avg);
+          return parseFloat(a.pgAvg) - parseFloat(b.pgAvg);
         },
       },
       {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
+        width: 100,
+        fixed: 'right',
         filters: actionFilterOption,
         onFilter: (value, record) =>
           String(this.state.actionResult[record.key]) === value,
@@ -121,47 +131,6 @@ export default class proBoard extends PureComponent {
             </Select>
           );
         },
-      },
-    ];
-    this.dataSource = [
-      {
-        name: '张三',
-        teacher: '张宇',
-        type: '创新训练项目',
-        collage: '水利学院',
-        result1: '60',
-        result2: '60',
-        result3: '60',
-        result4: '60',
-        avg: '60',
-        action: '1',
-        key: 1,
-      },
-      {
-        name: '李四',
-        teacher: '张宇',
-        type: '创业训练项目',
-        collage: '电气与信息学院',
-        result1: '61',
-        result2: '61',
-        result3: '61',
-        result4: '61',
-        avg: '61',
-        action: '1',
-        key: 2,
-      },
-      {
-        name: '王五',
-        teacher: '张宇',
-        type: '创业实践项目',
-        collage: '电气与信息学院',
-        result1: '59',
-        result2: '59',
-        result3: '59',
-        result4: '59',
-        avg: '59',
-        action: '1',
-        key: 3,
       },
     ];
   }
@@ -195,7 +164,7 @@ export default class proBoard extends PureComponent {
   submitResult = () => {
     let flag = true;
 
-    this.dataSource.forEach((item) => {
+    this.props.data.forEach((item) => {
       if (!this.state.actionResult[item.key]) {
         flag = false;
       }
@@ -203,6 +172,9 @@ export default class proBoard extends PureComponent {
 
     if (flag) {
       console.log(this.state.actionResult);
+      console.log(
+        manageSubmitFormatter(this.props.title, this.state.actionResult),
+      );
     } else {
       message.error('请为所有项目评分后再提交!');
     }
@@ -223,7 +195,14 @@ export default class proBoard extends PureComponent {
     };
   };
   render() {
-    const { renderChildren, title } = this.props;
+    const {
+      renderChildren,
+      title,
+      stopCollect,
+      getManagerProcess,
+      init,
+      pKey,
+    } = this.props;
 
     return (
       <div className="manager-table-container">
@@ -246,14 +225,15 @@ export default class proBoard extends PureComponent {
           </div>
         </div>
         <Table
-          dataSource={this.dataSource}
+          dataSource={this.props.data}
           columns={this.columns}
           rowSelection={this.getRowSelection()}
+          scroll={{ x: 1300 }}
         />
         <div className="button-container">
           <Button
             onClick={() => {
-              console.log('stop');
+              stopCollect({ key: pKey }).then(init);
             }}
           >
             停止收取

@@ -60,8 +60,8 @@ class Login extends PureComponent {
             })(
               <Select>
                 <Select.Option value='学生'>学生</Select.Option>
-                <Select.Option value='评委'>评审</Select.Option>
-                <Select.Option value='老师'>指导教师</Select.Option>
+                <Select.Option value='评委'>评委</Select.Option>
+                <Select.Option value='教师'>指导教师</Select.Option>
                 <Select.Option value='管理员'>管理员</Select.Option>
               </Select>
             )}

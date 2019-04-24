@@ -11,25 +11,47 @@ class Student extends PureComponent {
     super(props);
   }
   componentDidMount() {
-    this.props.getStudentProcess({
-      account: this.props.userAccount
-    })
+    this.props.getStudentProcess({ account: this.props.userAccount });
   }
-  renderChildren() {
+  renderChildren = () => {
+    const { sProcess } = this.props;
+    console.log(sProcess);
     return (
       <div className="my-project">
         我的项目：
-        <Link to="/student/new-project">
-          <div className="add">+</div>
-        </Link>
+        {(sProcess.projectList || []).length ? (
+          <div className="project-block">
+            {sProcess.projectList.map((item) => {
+              return (
+                <div key={item}>
+                  <span>{item.status}: </span>
+                  {sProcess.isCollect === '收取材料' ? (
+                    <Link to={`/student/edit-project/${item.key}`}>
+                      {item.fileName}
+                    </Link>
+                  ) : (
+                    <span>{item.fileName}</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <Link to="/student/new-project">
+            <div className="add">+</div>
+          </Link>
+        )}
       </div>
     );
-  }
+  };
   render() {
     return (
       <div className="student-container">
         <div className="content-container">
-          <NowProcess renderChildren={this.renderChildren}/>
+          <NowProcess
+            renderChildren={this.renderChildren}
+            data={this.props.sProcess}
+          />
         </div>
       </div>
     );

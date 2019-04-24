@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Table, Divider, Modal, Button, Input, Select } from 'antd';
+import { Table, Divider, Modal, Button, Input, Select, message } from 'antd';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { actions } from 'store/store';
@@ -20,52 +20,48 @@ class ViewPro extends PureComponent {
       },
       {
         title: '项目总数',
-        dataIndex: 'total',
-        key: 'total',
+        dataIndex: 'sum',
+        key: 'sum',
       },
       {
         title: '状态',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'pStatus',
+        key: 'pStatus',
       },
       {
         title: '查看详情',
         dataIndex: 'detail',
         key: 'detail',
         render: (text, record) => {
-          console.log(text, record);
-          return <Link to={`/manager/view-project/${text}`}>查看详情</Link>;
+          console.log(record)
+          return (
+            <Link to={`/manager/view-project/${record.key}`}>查看详情</Link>
+          );
         },
       },
     ];
-    this.dataSource = [
-      {
-        name: '2017SITP',
-        total: '1010',
-        status: '已结题',
-        detail: '2017SITP',
-        key: 1,
-      },
-      {
-        name: '2018SITP',
-        total: '1010',
-        status: '结题中',
-        detail: '2018SITP',
-        key: 2,
-      },
-      {
-        name: '2019SITP',
-        total: '1010',
-        status: '中期检查中',
-        detail: '2019SITP',
-        key: 3,
-      },
-    ];
   }
-  handleChange = (name, e) => {
+  componentDidMount() {
+    const { processManage, userAccount } = this.props;
+
+    processManage({ account: userAccount });
+  }
+  handleChange = (name, value) => {
     this.setState({
-      [name]: e.target.value,
+      [name]: value,
     });
+  };
+  handleOk = () => {
+    const { beginTime = '', endTime = '', processName = '' } = this.state;
+    const { processManage, newProcess, userAccount } = this.props;
+
+    if (!beginTime || !endTime || !processName)
+      return message.error('请完善信息');
+
+    newProcess({ beginTime, endTime, processName }).then(() => {
+      processManage({ account: userAccount });
+    });
+    this.handleCancel();
   };
   handleCancel = () => {
     this.setState({
@@ -77,7 +73,10 @@ class ViewPro extends PureComponent {
     return (
       <div className="viewPro-container">
         <div className="table-container">
-          <Table dataSource={this.dataSource} columns={this.columns} />
+          <Table
+            dataSource={this.props.processManageData}
+            columns={this.columns}
+          />
           <Button
             type="primary"
             onClick={() => {
@@ -95,26 +94,28 @@ class ViewPro extends PureComponent {
             onOk={this.handleOk}
             confirmLoading={this.state.confirmLoading}
             onCancel={this.handleCancel}
+            okText="确认"
+            cancelText="取消"
             width={450}
           >
             <span className="label">流程类型:</span>
             <Select
-            style={{ display: 'block' }}
-            // onChange={(value) => this.setState({ rowSelectValue: value })}
-            // value={this.state.rowSelectValue}
+              style={{ display: 'block' }}
+              onChange={(value) => this.handleChange('processName', value)}
+              value={this.state.processName}
             >
-              <Select.Option value="A">立项</Select.Option>
-              <Select.Option value="B">中期/结题</Select.Option>
+              <Select.Option value="立项">立项</Select.Option>
+              <Select.Option value="中期检查/结题">中期检查/结题</Select.Option>
             </Select>
             <span className="label">开始时间:</span>
             <Input
-              value={this.state.proName}
-              onChange={(e) => this.handleChange('proName', e)}
+              value={this.state.beginTime}
+              onChange={(e) => this.handleChange('beginTime', e.target.value)}
             />
             <span className="label">结束时间:</span>
             <Input
-              value={this.state.proName}
-              onChange={(e) => this.handleChange('proName', e)}
+              value={this.state.endTime}
+              onChange={(e) => this.handleChange('endTime', e.target.value)}
             />
           </Modal>
         </div>

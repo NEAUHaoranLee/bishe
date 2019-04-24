@@ -41,7 +41,7 @@ const routers = (
         <Route exact path='/manager' component={Manager} />
         <Route exact path='/manager/view-project' component={ViewPro} />
         <Route exact path='/manager/view-project/:id' component={Detail} />
-        <Route exact path='/judge' component={Judge} />
+        <Route exact path='/judges' component={Judge} />
       </Switch>
     </App>
   </Router>

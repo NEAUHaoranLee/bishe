@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
 import { actions } from 'store/store';
 import { withRouter } from 'react-router-dom';
+import { editDataFormatter } from 'src/pure';
 import {
+  message,
   Form,
   Select,
   Input,
@@ -28,21 +30,58 @@ class Project extends PureComponent {
     };
   }
   componentDidMount() {
+    this.props.getStudentProcess({ account: this.props.userAccount });
+
     if (this.props.match.params.id) {
-      this.setState({
-        disabled: true,
-        file: {
-          pathThird: 'kakakaka',
-        }
-      });
-      this.props.form.setFieldsValue({ pathThird: 'llala' });
+      this.props.editProject({ key: this.props.match.params.id });
     }
   }
+  componentWillReceiveProps(newProps) {
+    if (this.props.editData !== newProps.editData) {
+      console.log(1)
+      const { pathFirst, pathSecond, pathThird } = newProps.editData.tableData;
+      this.setState({
+        // disabled: true,
+        file: { pathFirst, pathSecond, pathThird },
+      });
+      this.props.form.setFieldsValue(
+        editDataFormatter(newProps.editData.tableData),
+      );
+    }
+  }
+  formDataFormatter = (value) => {
+    let formValue = value || this.props.form.getFieldsValue();
+    let { pathFirst, pathSecond, pathThird } = formValue;
+
+    for (const k in formValue) {
+      formValue[k] = formValue[k] ? formValue[k] : '';
+    }
+
+    formValue.pathFirst = pathFirst
+      ? `${pathFirst[0].response.data.dir}$*$${pathFirst[0].originFileObj.name}`
+      : '';
+    formValue.pathSecond = pathSecond
+      ? `${pathSecond[0].response.data.dir}$*$${
+          pathSecond[0].originFileObj.name
+        }`
+      : '';
+    formValue.pathThird = pathThird
+      ? `${pathThird[0].response.data.dir}$*$${pathThird[0].originFileObj.name}`
+      : '';
+    formValue.key = this.props.match.params.id || this.props.sProcess.key;
+    formValue.leaderAccount = this.props.userAccount;
+
+    return formValue;
+  };
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields(null, (err, values) => {
       if (!err) {
-        console.log('Received values of form: ', values);
+        const formValue = this.formDataFormatter(values);
+
+        this.props
+          .applyProject(formValue)
+          .then(() => this.props.history.push('/student/my-project'));
       }
     });
   };
@@ -58,8 +97,17 @@ class Project extends PureComponent {
     };
   };
   onSave = () => {
-    const formValue = this.props.form.getFieldsValue();
+    const formValue = this.formDataFormatter();
+
     console.log(formValue);
+    if (formValue.name) {
+      this.props
+        .saveProject(formValue)
+        .then(() => this.props.history.push('/student/my-project'))
+        .catch(() => message.error('保存失败，可能是当前流程已存在项目'));
+    } else {
+      message.error('咋也得填写项目名称和指导教师信息吧大哥！！');
+    }
   };
   render() {
     const { getFieldDecorator, getFieldsValue } = this.props.form;
@@ -75,7 +123,7 @@ class Project extends PureComponent {
         <div className="title">编辑项目</div>
         <Form {...formItemLayout} onSubmit={this.handleSubmit}>
           <Form.Item label="项目名称:">
-            {getFieldDecorator('pName', {
+            {getFieldDecorator('name', {
               rules: [{ required: true, message: '请输入项目名称!' }],
               validateTrigger: false,
             })(
@@ -86,20 +134,20 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="项目类型:">
-            {getFieldDecorator('pType', {
+            {getFieldDecorator('type', {
               rules: [{ required: true, message: '请选择项目类型!' }],
             })(
               <Select
                 placeholder={formValue.projectType || '请选择项目类型'}
                 disabled={disabled}
               >
-                <Select.Option value="1" key="1">
+                <Select.Option value="创新训练项目" key="1">
                   创新训练项目
                 </Select.Option>
-                <Select.Option value="2" key="2">
+                <Select.Option value="创业训练项目" key="2">
                   创业训练项目
                 </Select.Option>
-                <Select.Option value="3" key="3">
+                <Select.Option value="创业实践项目" key="3">
                   创业实践项目
                 </Select.Option>
               </Select>,
@@ -117,34 +165,23 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="负责人所在学院:" wrapperCol={{ span: 6 }}>
-            {getFieldDecorator('leaderCollage', {
+            {getFieldDecorator('leaderCollege', {
               rules: [{ required: true, message: '请选择所在学院!' }],
             })(
               <Select
                 placeholder={formValue.collage || '所在学院'}
                 disabled={disabled}
               >
-                <Select.Option value="1" key="1">
+                <Select.Option value="电气与信息学院" key="1">
                   电气与信息学院
                 </Select.Option>
-                <Select.Option value="2" key="2">
+                <Select.Option value="工程学院" key="2">
                   工程学院
                 </Select.Option>
-                <Select.Option value="3" key="3">
+                <Select.Option value="经管学院" key="3">
                   经管学院
                 </Select.Option>
               </Select>,
-            )}
-          </Form.Item>
-          <Form.Item label="负责人学号:" wrapperCol={{ span: 4 }}>
-            {getFieldDecorator('leaderAccount', {
-              rules: [{ required: true, message: '请输入学号!' }],
-              validateTrigger: false,
-            })(
-              <Input
-                placeholder={formValue.oAccount || '请输入学号'}
-                disabled={disabled}
-              />,
             )}
           </Form.Item>
           <Form.Item label="参与人数:" wrapperCol={{ span: 4 }}>
@@ -194,7 +231,18 @@ class Project extends PureComponent {
               />,
             )}
           </Form.Item>
-          <Form.Item label="指导教师职称:" wrapperCol={{ span: 5 }}>
+          <Form.Item label="指导教师工号:" wrapperCol={{ span: 4 }}>
+            {getFieldDecorator('account', {
+              rules: [{ required: true, message: '请输入指导教师工号!' }],
+              validateTrigger: false,
+            })(
+              <Input
+                placeholder={formValue.oAccount || '请输入指导教师工号'}
+                disabled={disabled}
+              />,
+            )}
+          </Form.Item>
+          {/* <Form.Item label="指导教师职称:" wrapperCol={{ span: 5 }}>
             {getFieldDecorator('teacherTitle', {
               rules: [{ required: true, message: '请输入指导教师职称!' }],
               validateTrigger: false,
@@ -204,9 +252,9 @@ class Project extends PureComponent {
                 disabled={disabled}
               />,
             )}
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item label="项目来源:" wrapperCol={{ span: 5 }}>
-            {getFieldDecorator('pSource', {
+            {getFieldDecorator('source', {
               rules: [{ required: true, message: '请输入项目来源!' }],
               validateTrigger: false,
             })(
@@ -217,7 +265,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="项目所属一级学科代码:" wrapperCol={{ span: 4 }}>
-            {getFieldDecorator('pCode', {
+            {getFieldDecorator('code', {
               rules: [{ required: true, message: '请输入一级学科代码!' }],
               validateTrigger: false,
             })(
@@ -225,7 +273,7 @@ class Project extends PureComponent {
             )}
           </Form.Item>
           <Form.Item label="项目简介:">
-            {getFieldDecorator('pIntroduce')(
+            {getFieldDecorator('introduction')(
               <Input.TextArea
                 rows={4}
                 placeholder={formValue.pIntroduce || '200字以内'}
@@ -301,7 +349,7 @@ class Project extends PureComponent {
               保存
             </Button>
             <Button type="primary" htmlType="submit">
-              Submit
+              提交
             </Button>
           </Form.Item>
         </Form>

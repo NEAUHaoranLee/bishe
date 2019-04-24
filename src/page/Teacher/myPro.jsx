@@ -19,14 +19,14 @@ class myPro extends PureComponent {
       },
       {
         title: '负责人姓名',
-        dataIndex: 'oName',
-        key: 'oName',
+        dataIndex: 'leaderName',
+        key: 'leaderName',
         width: 150,
       },
       {
         title: '学院',
-        dataIndex: 'collage',
-        key: 'collage',
+        dataIndex: 'college',
+        key: 'college',
         width: 200,
         filters: collage.map((item) => {
           return {
@@ -38,8 +38,8 @@ class myPro extends PureComponent {
       },
       {
         title: '当前流程',
-        dataIndex: 'process',
-        key: 'process',
+        dataIndex: 'status',
+        key: 'status',
         filters: processType.map((item) => {
           return {
             text: item,
@@ -60,8 +60,8 @@ class myPro extends PureComponent {
       },
       {
         title: '项目来源',
-        dataIndex: 'source',
-        key: 'source',
+        dataIndex: 'pSource',
+        key: 'pSource',
       },
       {
         title: '下载文件',
@@ -121,13 +121,15 @@ class myPro extends PureComponent {
       },
     ];
   }
-  componentDidMount() {}
+  componentDidMount() {
+    this.props.teacherProjectList({ account: this.props.userAccount });
+  }
   render() {
     return (
       <div className="teacher-container">
         <div className="table-container" style={{ width: 1000 }}>
           <Table
-            dataSource={this.dataSource}
+            dataSource={this.props.tProjectList}
             columns={this.columns}
             scroll={{ x: 1400 }}
           />

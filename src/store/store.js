@@ -4,6 +4,7 @@ import {
 } from 'antd';
 import axios from 'axios';
 import md5 from 'js-md5';
+import * as p from 'src/pure';
 
 const instance = axios.create({
   baseURL: 'http://localhost:8080/',
@@ -12,10 +13,24 @@ const instance = axios.create({
 axios.defaults.withCredentials = true; //让ajax携带cookie
 
 const initState = {
-  userType: 'teacher',
+  userType: '',
   userName: '',
   userAccount: '',
-  loading: false
+  loading: false,
+  //管理员
+  mProcess: [],
+  // mProcessTable: [], //首页
+  processManageData: [], //流程管理
+  processDetailsData: [], //详情
+  //学生
+  sProcess: {},
+  sProject: [],
+  editData: {},
+  //评审
+  judgeData: {},
+  //老师
+  tApproveList: [],
+  tProjectList: [],
 }
 
 const TYPE = {
@@ -39,20 +54,22 @@ export const actions = {
   },
   //根据cookie查询登录状态
   getUserInfo: () => (dispatch) => {
-    instance.get('/checkLogin').then(({
+    return instance.get('/checkLogin').then(({
       data: {
         code,
         data
       }
     }) => {
-      const userType = code === 200 ? data.userType : 'login';
-
-      dispatch(
-        actions.updateProps({
-          userType,
-          userName: data.userName,
-        })
-      )
+      if (code === 200) {
+        dispatch(
+          actions.updateProps({
+            userType: data.userType,
+            userName: data.userName,
+            userAccount: data.account,
+          })
+        )
+        return false;
+      } else return true;
     })
   },
   //用户登录
@@ -80,9 +97,8 @@ export const actions = {
     })
   },
   userSignOut: () => (dispatch) => {
-    instance.get('/auth/logout').then(() => {
-      Cookies.erase('login-ticket');
-      Cookies.erase('login-ticket.sig');
+    instance.get('/exit').then(() => {
+      // Cookies.erase('login_ticket');
 
       dispatch(
         actions.updateProps({
@@ -95,24 +111,141 @@ export const actions = {
   getStudentProcess: (params) => (dispatch) => {
     instance.post('/student/currentProcess', params).then((res) => {
       console.log(res)
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          sProcess: res.data.data,
+        })
+      );
     })
   },
   saveProject: (params) => (dispatch) => {
-    instance.post('/student/currentProcess', params).then((res) => {
+    return instance.post('/student/save', params).then((res) => {
+      console.log(res)
+    })
+  },
+  editProject: (params) => (dispatch) => {
+    return instance.post('/student/edit', params).then((res) => {
+      dispatch(
+        actions.updateProps({
+          editData: res.data.data,
+        })
+      );
+    })
+  },
+  applyProject: (params) => (dispatch) => {
+    return instance.post('/student/apply', params).then((res) => {
       console.log(res)
     })
   },
   getStudentProject: (params) => (dispatch) => {
     instance.post('/student/myProject', params).then((res) => {
       console.log(res)
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          sProject: res.data.data,
+        })
+      );
     })
   },
   //管理员
   getManagerProcess: (params) => (dispatch) => {
     instance.post('/manager/currentProcess', params).then((res) => {
-      console.log(res)
+      if (res.data.code !== 200 || res.data.data === 'null') return;
+
+      dispatch(
+        actions.updateProps({
+          mProcess: res.data.data.unifiedTable,
+          mProcessTable: p.managerProDataFormatter(res.data.data),
+        })
+      );
     })
-  }
+  },
+  processManage: (params) => (dispatch) => {
+    instance.post('/manager/overview', params).then((res) => {
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          processManageData: res.data.data
+        })
+      );
+    })
+  },
+  processDetails: (params) => (dispatch) => {
+    instance.post('/manager/details', params).then((res) => {
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          processDetailsData: res.data.data
+        })
+      );
+    })
+  },
+  newProcess: (params) => (dispatch) => {
+    return instance.post('/manager/newAndEditProcess', params);
+  },
+  stopCollect: (params) => (dispatch) => {
+    console.log(params)
+    return instance.post('/manager/stop', params);
+  },
+  submitFinalResult: (params) => (dispatch) => {
+    return instance.post('/manager/apply', params);
+  },
+  //评委
+  getJudgeData: (params) => (dispatch) => {
+    instance.post('/judge/view', params).then((res) => {
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          judgeData: res.data.data,
+        })
+      );
+    })
+  },
+  submitJudges: (params) => (dispatch) => {
+    instance.post('/judge/apply', params).then((res) => {
+      if (res.data.code !== 200) return;
+    })
+  },
+  saveJudges: (params) => (dispatch) => {
+    instance.post('/judge/save', params).then((res) => {
+      if (res.data.code !== 200) return;
+    })
+  },
+  //老师
+  teacherApproveList: (params) => (dispatch) => {
+    instance.post('/teacher/pApproval', params).then((res) => {
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          tApproveList: res.data.data === 'null' ? [] : res.data.data,
+        })
+      );
+    })
+  },
+  teacherProjectList: (params) => (dispatch) => {
+    instance.post('/teacher/myProject', params).then((res) => {
+      if (res.data.code !== 200) return;
+
+      dispatch(
+        actions.updateProps({
+          tProjectList: res.data.data === 'null' ? [] : res.data.data,
+        })
+      );
+    })
+  },
+  teacherApprove: (params) => (dispatch) => {
+    return instance.post('/teacher/approve', params).then((res) => {
+      if (res.data.code === 200) return true;
+    })
+  },
   // createUsers: (params) => (dispatch) => {
   //   instance.post('/auth/createAuth', params)
   // }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { Table, Divider } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { actions } from 'store/store';
 import { collage, projectType } from 'config/index';
@@ -19,14 +19,14 @@ class Detail extends PureComponent {
       },
       {
         title: '负责人姓名',
-        dataIndex: 'oName',
-        key: 'oName',
+        dataIndex: 'leaderUserName',
+        key: 'leaderUserName',
         width: 150,
       },
       {
         title: '学院',
-        dataIndex: 'collage',
-        key: 'collage',
+        dataIndex: 'college',
+        key: 'college',
         width: 250,
         filters: collage.map((item) => {
           return {
@@ -38,18 +38,18 @@ class Detail extends PureComponent {
       },
       {
         title: '指导教师',
-        dataIndex: 'teacher',
-        key: 'teacher',
+        dataIndex: 'teacherName',
+        key: 'teacherName',
       },
       {
         title: '结果',
-        dataIndex: 'result',
-        key: 'result',
+        dataIndex: 'avg',
+        key: 'avg',
       },
       {
         title: '项目来源',
-        dataIndex: 'source',
-        key: 'source',
+        dataIndex: 'pSource',
+        key: 'pSource',
       },
       {
         title: '下载文件',
@@ -58,57 +58,28 @@ class Detail extends PureComponent {
         fixed: 'right',
         width: 100,
         render: (text, record) => {
-          console.log(text, record);
+          // console.log(text, record);
           return <Link to={`/manager/view-project/${text}`}>download</Link>;
         },
       },
     ];
-    this.dataSource = [
-      {
-        pName: '基于web的SIPT项目管理系统',
-        oName: '李大宝',
-        collage: '电气与信息学院',
-        teacher: 'Mr.张',
-        result: '校级重点优秀结题',
-        source: '学生自拟',
-        key: 1,
-      },
-      {
-        pName: '基于web的SIPT项目管理系统',
-        oName: '李大宝',
-        collage: '电气与信息学院',
-        teacher: 'Mr.张',
-        result: '校级重点优秀结题',
-        source: '学生自拟',
-        key: 2,
-      },
-      {
-        pName: '基于web的SIPT项目管理系统',
-        oName: '李大宝',
-        collage: '电气与信息学院',
-        teacher: 'Mr.张',
-        result: '校级重点优秀结题',
-        source: '学生自拟',
-        key: 3,
-      },
-      {
-        pName: '基于web的SIPT项目管理系统',
-        oName: '李大宝',
-        collage: '电气与信息学院',
-        teacher: 'Mr.张',
-        result: '校级重点优秀结题',
-        source: '学生自拟',
-        key: 4,
-      },
-    ];
   }
+  componentDidMount() {
+    const {
+      processDetails,
+      match: {
+        params: { id },
+      },
+    } = this.props;
 
+    processDetails({ key: id });
+  }
   render() {
     return (
       <div className="myPro-container">
         <div className="table-container" style={{ width: 1000 }}>
           <Table
-            dataSource={this.dataSource}
+            dataSource={this.props.processDetailsData}
             columns={this.columns}
             scroll={{ x: 1200 }}
           />
@@ -121,4 +92,4 @@ class Detail extends PureComponent {
 export default connect(
   (state) => state,
   actions,
-)(Detail);
+)(withRouter(Detail));

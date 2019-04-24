@@ -14,12 +14,8 @@ export const navMap = {
             name: '当前流程',
         },
         {
-            path: '/manager/process-management',
-            name: '流程管理',
-        },
-        {
             path: '/manager/view-project',
-            name: '项目概览',
+            name: '流程管理',
         }
     ],
     teacher: [
