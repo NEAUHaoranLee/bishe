@@ -42,8 +42,10 @@ class Menager extends PureComponent {
                   stopCollect={stopCollect}
                   init={this.init}
                   pKey={item.key}
-                  title={item.processName}
+                  title={item.currentProcess}
                   level={item.level}
+                  userAccount={this.props.userAccount}
+                  submitFinalResult={this.props.submitFinalResult}
                   data={item.managerDtoList[item.currentProcess]}
                 />
               </div>

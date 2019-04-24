@@ -171,9 +171,8 @@ export default class proBoard extends PureComponent {
     });
 
     if (flag) {
-      console.log(this.state.actionResult);
-      console.log(
-        manageSubmitFormatter(this.props.title, this.state.actionResult),
+      this.props.submitFinalResult(
+        manageSubmitFormatter(this.props.userAccount, this.state.actionResult),
       );
     } else {
       message.error('请为所有项目评分后再提交!');

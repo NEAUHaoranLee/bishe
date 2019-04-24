@@ -15,7 +15,7 @@ export function manageSubmitFormatter(key, item) {
   
   for (const v in item) {
     result.push({
-      userKey: v,
+      key: v,
       level: item[v],
     })
   }
