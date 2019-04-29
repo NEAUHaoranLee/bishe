@@ -143,10 +143,12 @@ export default class proBoard extends PureComponent {
   };
   submitResult = () => {
     if (this.props.canSubmit) {
-      this.props.submitJudges({
-        account: this.props.userAccount,
-        data: this.state.dataSource,
-      });
+      this.props
+        .submitJudges({
+          account: this.props.userAccount,
+          data: this.state.dataSource,
+        })
+        .then(() => message.success('提交成功！'));
     } else message.error('请为完成所有待审批项目！');
   };
   saveResult = () => {
@@ -169,13 +171,11 @@ export default class proBoard extends PureComponent {
         <Table dataSource={this.state.dataSource} columns={this.getColumn()} />
         {this.props.type === 'judged' && (
           <div className="button-container">
-            {this.props.level === '校级' && (
-              <Button
-                onClick={_.throttle(this.saveResult, 2000, { leading: true })}
-              >
-                保存修改
-              </Button>
-            )}
+            <Button
+              onClick={_.throttle(this.saveResult, 2000, { leading: true })}
+            >
+              保存修改
+            </Button>
             <Button
               //函数防抖
               onClick={_.throttle(this.submitResult, 2000, { leading: true })}

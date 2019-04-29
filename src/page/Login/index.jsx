@@ -58,7 +58,7 @@ class Login extends PureComponent {
             {getFieldDecorator('role', {
               rules: [{ required: true, message: '选择角色!' }],
             })(
-              <Select>
+              <Select placeholder='选择角色'>
                 <Select.Option value='学生'>学生</Select.Option>
                 <Select.Option value='评委'>评委</Select.Option>
                 <Select.Option value='教师'>指导教师</Select.Option>

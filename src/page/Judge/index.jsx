@@ -58,7 +58,7 @@ class Judge extends PureComponent {
                 <ProBoard
                   title={item.title}
                   type="judging"
-                  key={item}
+                  key={index}
                   data={item.data}
                   updateData={(value) => {
                     this.updateData(value, index);
@@ -74,7 +74,7 @@ class Judge extends PureComponent {
                   {...this.props}
                   title={item.title}
                   type="judged"
-                  key={item}
+                  key={index}
                   data={item.data}
                   canSubmit={this.state.notApproval[index].data.length === 0}
                   updateData={(value) => {

@@ -33,7 +33,7 @@ class ViewPro extends PureComponent {
         dataIndex: 'detail',
         key: 'detail',
         render: (text, record) => {
-          console.log(record)
+          console.log(record);
           return (
             <Link to={`/manager/view-project/${record.key}`}>查看详情</Link>
           );
@@ -74,20 +74,22 @@ class ViewPro extends PureComponent {
       <div className="viewPro-container">
         <div className="table-container">
           <Table
-            dataSource={this.props.processManageData}
+            dataSource={this.props.processManageData.data}
             columns={this.columns}
           />
-          <Button
-            type="primary"
-            onClick={() => {
-              this.setState({
-                modalVisible: true,
-                modalTitle: '新建流程',
-              });
-            }}
-          >
-            新建流程
-          </Button>
+          {this.props.processManageData.level === '校级' && (
+            <Button
+              type="primary"
+              onClick={() => {
+                this.setState({
+                  modalVisible: true,
+                  modalTitle: '新建流程',
+                });
+              }}
+            >
+              新建流程
+            </Button>
+          )}
           <Modal
             title={this.state.modalTitle}
             visible={this.state.modalVisible}

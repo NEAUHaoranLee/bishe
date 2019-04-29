@@ -36,7 +36,33 @@ export default class proBoard extends PureComponent {
       rowSelection: [],
       rowSelectValue: '',
     };
-    this.columns = [
+  }
+  componentDidMount() {
+    let actionResult = {};
+    console.log(this.props.data);
+    this.props.data.forEach((item) => {
+      if (item.yep) {
+        actionResult[item.key] = item.yep;
+      }
+    });
+
+    this.setState({ actionResult });
+  }
+  componentWillReceiveProps(newProps) {
+    if (this.props.data !== newProps.data) {
+      let actionResult = {};
+
+      newProps.data.forEach((item) => {
+        if (item.yep) {
+          actionResult[item.key] = item.yep;
+        }
+      });
+
+      this.setState({ actionResult });
+    }
+  }
+  getColumn = () => {
+    return [
       {
         title: '项目名称',
         dataIndex: 'pName',
@@ -117,7 +143,7 @@ export default class proBoard extends PureComponent {
           String(this.state.actionResult[record.key]) === value,
         render: (text, record) => {
           const { actionResult } = this.state;
-
+          console.log(111111111, actionResult);
           return (
             <Select
               style={{ width: 90 }}
@@ -133,7 +159,7 @@ export default class proBoard extends PureComponent {
         },
       },
     ];
-  }
+  };
   selectChange = (record, value) => {
     let result = { ...this.state.actionResult };
     result[record.key] = value;
@@ -171,9 +197,17 @@ export default class proBoard extends PureComponent {
     });
 
     if (flag) {
-      this.props.submitFinalResult(
-        manageSubmitFormatter(this.props.userAccount, this.state.actionResult),
-      );
+      this.props
+        .submitFinalResult(
+          manageSubmitFormatter(
+            this.props.userAccount,
+            this.state.actionResult,
+          ),
+        )
+        .then(() => {
+          message.success('提交成功！');
+          this.props.init();
+        });
     } else {
       message.error('请为所有项目评分后再提交!');
     }
@@ -224,19 +258,23 @@ export default class proBoard extends PureComponent {
           </div>
         </div>
         <Table
-          dataSource={this.props.data}
-          columns={this.columns}
+          dataSource={this.props.state === '已提交' ? [] : this.props.data}
+          columns={this.getColumn()}
           rowSelection={this.getRowSelection()}
           scroll={{ x: 1300 }}
         />
         <div className="button-container">
-          <Button
-            onClick={() => {
-              stopCollect({ key: pKey }).then(init);
-            }}
-          >
-            停止收取
-          </Button>
+          {this.props.level === '校级' && (
+            <Button
+              onClick={() => {
+                if (this.props.state !== '收取材料')
+                  return message.error('现在无法停止收取');
+                stopCollect({ key: pKey }).then(init);
+              }}
+            >
+              停止收取
+            </Button>
+          )}
           <Button
             //函数防抖
             onClick={_.throttle(this.submitResult, 2000, { leading: true })}

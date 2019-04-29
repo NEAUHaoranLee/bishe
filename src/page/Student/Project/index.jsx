@@ -38,7 +38,7 @@ class Project extends PureComponent {
   }
   componentWillReceiveProps(newProps) {
     if (this.props.editData !== newProps.editData) {
-      console.log(1)
+      console.log(1);
       const { pathFirst, pathSecond, pathThird } = newProps.editData.tableData;
       this.setState({
         // disabled: true,
@@ -79,9 +79,12 @@ class Project extends PureComponent {
       if (!err) {
         const formValue = this.formDataFormatter(values);
 
-        this.props
-          .applyProject(formValue)
-          .then(() => this.props.history.push('/student/my-project'));
+        this.props.applyProject(formValue).then((res) => {
+          if (res.code === 200) {
+            this.props.history.push('/student/my-project');
+            message.success('提交成功');
+          } else if (res.code === 405) message.error(res.data);
+        });
       }
     });
   };
@@ -99,14 +102,18 @@ class Project extends PureComponent {
   onSave = () => {
     const formValue = this.formDataFormatter();
 
-    console.log(formValue);
     if (formValue.name) {
       this.props
         .saveProject(formValue)
-        .then(() => this.props.history.push('/student/my-project'))
+        .then((res) => {
+          if (res) {
+            message.success('保存成功');
+            this.props.history.push('/student/my-project');
+          }
+        })
         .catch(() => message.error('保存失败，可能是当前流程已存在项目'));
     } else {
-      message.error('咋也得填写项目名称和指导教师信息吧大哥！！');
+      message.error('咋也得填写项目名称吧大哥！！');
     }
   };
   render() {

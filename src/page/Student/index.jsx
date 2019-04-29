@@ -21,9 +21,9 @@ class Student extends PureComponent {
         我的项目：
         {(sProcess.projectList || []).length ? (
           <div className="project-block">
-            {sProcess.projectList.map((item) => {
+            {sProcess.projectList.map((item, index) => {
               return (
-                <div key={item}>
+                <div key={index}>
                   <span>{item.status}: </span>
                   {sProcess.isCollect === '收取材料' ? (
                     <Link to={`/student/edit-project/${item.key}`}>

@@ -122,7 +122,7 @@ export const actions = {
   },
   saveProject: (params) => (dispatch) => {
     return instance.post('/student/save', params).then((res) => {
-      console.log(res)
+      if (res.data.code === 200) return res.data.code;
     })
   },
   editProject: (params) => (dispatch) => {
@@ -136,7 +136,7 @@ export const actions = {
   },
   applyProject: (params) => (dispatch) => {
     return instance.post('/student/apply', params).then((res) => {
-      console.log(res)
+      return res.data;
     })
   },
   getStudentProject: (params) => (dispatch) => {
@@ -190,7 +190,6 @@ export const actions = {
     return instance.post('/manager/newAndEditProcess', params);
   },
   stopCollect: (params) => (dispatch) => {
-    console.log(params)
     return instance.post('/manager/stop', params);
   },
   submitFinalResult: (params) => (dispatch) => {
@@ -209,7 +208,7 @@ export const actions = {
     })
   },
   submitJudges: (params) => (dispatch) => {
-    instance.post('/judge/apply', params).then((res) => {
+    return instance.post('/judge/apply', params).then((res) => {
       if (res.data.code !== 200) return;
     })
   },
